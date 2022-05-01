@@ -1,14 +1,23 @@
+# loading libraries
+library(dplyr)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+
 # loading data
 dfSurvey <- read.csv("data_new.csv")
 
 # removing case number column
 dfSurvey[,1] <- NULL
 
-# closer inspection shows that $Support_type is an open question, for now this column is removed
+# closer inspection shows that $Support_type, $Platforms, $Attendance_reason and $Participation are (partly) open questions, for now these columns are removed
 dfSurvey$Support_type <- NULL
+dfSurvey$Platforms <- NULL
+dfSurvey$Attendance_reason <- NULL
+dfSurvey$Participation <- NULL
 
 # converting non ordinal columns to factor
-dfSurvey[,c(2:7, 10, 12)] <- lapply(dfSurvey[,c(2:7, 10, 12)], as.factor)
+dfSurvey[,c(2:6, 9, 11, 28, 40)] <- lapply(dfSurvey[,c(2:7, 10, 11, 28, 40)], as.factor)
 
 # converting ordinal columns to factor and assigning ordinal ranking
 # Age_group
@@ -29,4 +38,7 @@ dfSurvey$Attendance <- factor(dfSurvey$Attendance, levels = c("less than 30%", "
 # Attendance_relative
 dfSurvey$Attendance_relative <- factor(dfSurvey$Attendance_relative, levels = c("Much Lesser", "Little Lesser", "Almost the Same", "Little More", "Much More"))
 
-#
+# Recoding likert scales (column 34 to 39, are somewhat Likert scale)
+for(i in c(14:26, 29:33)){
+  dfSurvey[,i] <- recode(dfSurvey[,i], "Strongly disagree" = 1, "Disagree" = 2, "Neither agree nor disagree" = 3, "Agree" = 4, "Strongly agree" = 5)
+}
